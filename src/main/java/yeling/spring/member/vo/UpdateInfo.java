@@ -1,5 +1,4 @@
 package yeling.spring.member.vo;
 
-public interface UpdateInfo {
-
+public class UpdateInfo {
 }

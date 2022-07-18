@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:aop="http://www.springframework.org/schema/aop"
+   xmlns:c="http://www.springframework.org/schema/c"
+   xmlns:p="http://www.springframework.org/schema/p"
+   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+      http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd">
+
+<bean id="loggingAdvice" class="yeling.spring.common.LoggingAdvice" />
+<bean id="cacheAdvice" class="yeling.spring.common.ArticleCacheAdvice" />
+<bean id="traceAdvice" class="yeling.spring.common.UpdateMemberInfoTraceAdvice" />
+<aop:config>
+      <aop:aspect id="loggingAspect" ref="loggingAdvice" order="1">
+            <aop:pointcut id="publicMethod"
+               expression="execution(public * yeling.spring..*(..))" />
+      <aop:before method="before" pointcut-ref="publicMethod" />
+      <aop:after-returning method="afterReturning"
+               pointcut-ref="publicMethod" returning="ret" />
+      <aop:after-throwing method="afterThrowing"
+               pointcut-ref="publicMethod" throwing="ex" />
+      <aop:after method="afterFinally"
+               pointcut-ref="publicMethod" />
+      </aop:aspect>
+      
+      <aop:aspect id="cacheAspect" ref="cacheAdvice" order="2">
+            <aop:around
+               pointcut="execution(public * *..ReadArticleServiceImpl.*(..))"
+                        method="cache" />
+      </aop:aspect>
+      <aop:aspect id="traceAspect" ref="traceAdvice" order="3">
+            <aop:after-returning
+                  pointcut="args(memberId,info)" method="traceReturn"
+                  returning="result" arg-names="joinPoint,result,memberId,info" />
+      </aop:aspect>
+</aop:config>
+<bean id="readArticleService" class="yeling.spring.board.service.ReadArticleServiceImpl" />
+<bean id="memberService" class="yeling.spring.member.service.MemberServiceImpl" />
+</beans>

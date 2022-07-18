@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd">
+
+	<bean id="performanceTraceAdvice" class="yeling.spring.common.ProfilingAdvice"></bean>
+	<aop:config>
+		<aop:aspect id="traceAspect1" ref="performanceTraceAdvice">
+			<aop:pointcut id="publicMethod" expression="execution(public * yeling.spring.board.service..*(..))" />
+			<aop:around pointcut-ref="publicMethod" method="trace" />
+		</aop:aspect>
+		<aop:aspect id="traceAspect2" ref="performanceTraceAdvice">
+			<aop:around pointcut="execution(public * yeling.spring.member.service..*(..))" method="trace"/>
+		</aop:aspect>
+	</aop:config>
+	<bean id="writeArticleService" class="yeling.spring.board.service.WriteArticleServiceImpl">
+		<constructor-arg><ref bean="articleDAO" /></constructor-arg>
+	</bean>
+	<bean id="articleDAO" class="yeling.spring.board.dao.OracleArticleDAO"></bean>
+	<bean id="memberService" class="yeling.spring.member.service.MemberServiceImpl"></bean>
+</beans>
